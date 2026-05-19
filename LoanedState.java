@@ -9,4 +9,9 @@ public final class LoanedState implements BookState {
     System.out.println("返却処理を行いました。");
     return new AvailableState();
   }
+
+  @Override
+  public int getStatusNum() {
+    return 0;
+  }
 }

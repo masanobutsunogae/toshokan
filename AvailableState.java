@@ -9,4 +9,9 @@ public final class AvailableState implements BookState {
   public BookState returnBook() throws Exception {
     throw new Exception("この本はすでに図書館にあります(返却できません)。");
   }
+
+  @Override
+  public int getStatusNum() {
+    return 1;
+  }
 }
