@@ -9,7 +9,7 @@ public class Book {
     this.state = this.state.borrowBook();
   }
 
-  public void return() throws Exception {
+  public void doReturn() throws Exception {
     this.state = this.state.returnBook();
   }
 
