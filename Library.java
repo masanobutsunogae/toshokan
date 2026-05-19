@@ -17,18 +17,20 @@ public class Library{
             System.out.println("3:本の返却");
             System.out.println("0:終了");
 
-            while(!isValid)
-            try {
-                i = scanner.nextInt();
-                if(i >= 0 && i <= 3){
-                    isValid = true;
+            while(!isValid){
+                try {
+                    i = scanner.nextInt();
+                    if(i >= 0 && i <= 3){
+                        isValid = true;
+                    } else{
+                        System.out.println("0~3の範囲で入力してください");
+                    }
+                } catch (InputMismatchException e){ //整数入力の例外処理
+                    System.out.println("整数を入力してください");
+                    scanner.next();
                 }
-            } catch (InputMismatchException e){ //整数入力の例外処理
-                System.out.println("整数を入力してください");
-                scanner.next();
             }
 
-            
             switch(i){
                 case 1:
                 System.out.println("検索");
