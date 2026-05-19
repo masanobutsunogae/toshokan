@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.*;
 
 public class LibraryDAO {
 
@@ -70,7 +71,7 @@ public class LibraryDAO {
         return null;
     }
 
-    //setState()
+    //setState(セットするID、状態)
     public boolean setState(
         int id,
         int state
@@ -119,5 +120,58 @@ public class LibraryDAO {
         }
 
         return false;
+    }
+
+    //searchBook('name') -> return List(id, 'name', 'author', status)
+    public List<Object> searchBook(String title){
+        Connection conn = null;
+
+        try{
+            conn = DriverManager.getConnection(
+                URL,
+                USER,
+                PASSWORD
+            );
+
+            String sql = 
+                "SELECT * FROM BOOK WHERE TITLE = ?";
+            
+            PreparedStatement pStmt = 
+                conn.prepareStatement(sql);
+            pStmt.setString(1, title);
+
+            ResultSet rs = pStmt.executeQuery();
+
+            if(rs.next()){
+                List<Object> bookData = 
+                    new ArrayList<Object>();
+                bookData.add(
+                    rs.getInt("ID")
+                );
+                bookData.add(
+                    rs.getString("TITLE")
+                );
+                bookData.add(
+                    rs.getString("AUTHOR")
+                );
+                bookData.add(
+                    rs.getInt("STATUS")
+                );
+
+                return bookData;
+            }
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        finally{
+            try{
+                if(conn != null){
+                    conn.close();
+                }
+            } catch(SQLException e){
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }
