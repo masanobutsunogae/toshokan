@@ -40,11 +40,21 @@ public class Library{
                 case 2:
                 System.out.println("貸出する本のidを入力してください。");
                 int brrowid = scanner.nextInt();
+                try{
+                    LibraryService.checkout(brrowid);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
                 //貸出関数
                 break;
                 case 3:
                 System.out.println("返却する本のidを入力してください。");
                 int returnid = scanner.nextInt();
+                try{
+                    LibraryService.checkin(returnid);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
                 //返却関数
                 break;
             }
