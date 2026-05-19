@@ -1,5 +1,5 @@
 public class LibraryService {
-  public void checkout(int bookId) throws Exception {
+  public static void checkout(int bookId) throws Exception {
     LibraryDAO dao = new LibraryDAO();
 
     Integer stateNum = dao.getState(bookId);
@@ -18,7 +18,7 @@ public class LibraryService {
     else throw new Exception("貸し出し処理の書き込みに失敗しました。");
   }
 
-  public void checkin(int bookId) throws Exception {
+  public static void checkin(int bookId) throws Exception {
     LibraryDAO dao = new LibraryDAO();
 
     Integer stateNum = dao.getState(bookId);
