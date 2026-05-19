@@ -17,7 +17,7 @@ public class LibraryDAO {
             e.printStackTrace();
         }
     }
-
+    //getState(検索するID)
     public Integer getState(int id) {
 
         Connection conn = null;
@@ -45,10 +45,10 @@ public class LibraryDAO {
                     rs.getInt("STATUS");
 
                 if (status == 0) {
-                    return 1;
+                    return 0;
                 }
                 else {
-                    return 0;
+                    return 1;
                 }
             }
 
@@ -70,6 +70,7 @@ public class LibraryDAO {
         return null;
     }
 
+    //setState()
     public boolean setState(
         int id,
         int state
