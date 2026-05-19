@@ -33,15 +33,18 @@ public class Library{
 
             switch(i){
                 case 1:
-                System.out.println("検索");
+                System.out.println("検索する本のタイトルまたは著者名を入力してください。");
+                String name = scanner.next();
                 //検索関数
                 break;
                 case 2:
-                System.out.println("貸出");
+                System.out.println("貸出する本のidを入力してください。");
+                int brrowid = scanner.nextInt();
                 //貸出関数
                 break;
                 case 3:
-                System.out.println("返却");
+                System.out.println("返却する本のidを入力してください。");
+                int returnid = scanner.nextInt();
                 //返却関数
                 break;
             }

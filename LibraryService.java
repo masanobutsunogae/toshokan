@@ -12,9 +12,10 @@ public class LibraryService {
 
     book.borrow();
 
-    dao.setState(bookId, book.getState().getStatusNum());
+    boolean setStateResult = dao.setState(bookId, book.getState().getStatusNum());
 
-    System.out.println("貸し出し処理が成功しました。");
+    if (setStateResult) System.out.println("貸し出し処理が成功しました。");
+    else throw new Exception("貸し出し処理の書き込みに失敗しました。");
   }
 
   public void checkin(int bookId) throws Exception {
@@ -30,8 +31,9 @@ public class LibraryService {
 
     book.doReturn();
 
-    dao.setState(bookId, book.getState().getStatusNum());
+    boolean setStateResult = dao.setState(bookId, book.getState().getStatusNum());
 
-    System.out.println("返却処理が成功しました。");
+    if (setStateResult) System.out.println("返却処理が成功しました。");
+    else throw new Exception("返却処理の書き込みに失敗しました。");
   }
 }
