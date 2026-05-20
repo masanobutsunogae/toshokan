@@ -47,4 +47,14 @@
 
 \end{lstlisting}
 
+\section{貸出状況の管理}
+本の貸出状況を管理するために、BoFのデザインパターンのStateパターンを用いている。
+BookStateインターフェースを作成し、AvailableState, LoanedStateクラスで継承している。
+この時、Java 17の新機能であるSealed Classesを使用し、他のクラスから継承できないように工夫をしている。
+
+このBookStateをBookクラスから管理している。
+Bookクラスでは、現在の状況に応じて自動的に貸し借り、また現在の状態を得れるようにしている。
+
+さらに、LibraryServiceクラスでは、引数で指定されたidの本の状態をLibraryDAOクラスから取得し、その情報を用いてBookクラスに貸し借りが可能か確認し、貸し借りが可能であれば変更後の状態をデータベースに書き込むようにしている。
+
 \end{document}
