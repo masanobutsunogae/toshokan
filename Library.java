@@ -6,12 +6,11 @@ public class Library {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        int i = 0;
-        boolean isValid = false;
+        int i;
 
         do {
             i = 0;
-            isValid = false;
+            boolean isValid = false;
 
             System.out.println("操作を選んでください。");
             System.out.println("1:本の検索");
