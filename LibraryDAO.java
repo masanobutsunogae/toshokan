@@ -117,7 +117,7 @@ public class LibraryDAO {
     }
 
     //searchBook('name') -> return List(id, 'name', 'author', status)
-    public static List<Object> searchBook(String title) {
+    public List<Object> searchBook(String title) {
         Connection conn = null;
 
         try {

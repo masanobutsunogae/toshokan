@@ -1,5 +1,6 @@
 
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Library {
@@ -38,7 +39,19 @@ public class Library {
                     String name = scanner.next();
                     //検索関数
                     try {
-                        LibraryDAO.searchBook(name);
+                        LibraryDAO dao = new LibraryDAO();
+
+                        List<Object> result = dao.searchBook(name);
+
+                        if (result != null) {
+                            System.out.println("ID : " + result.get(0));
+                            System.out.println("タイトル : " + result.get(1));
+                            System.out.println("著者 : " + result.get(2));
+                            System.out.println("貸出状態 : " + result.get(3));
+                        } else {
+                            System.out.println("本が見つかりません");
+                        }
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
