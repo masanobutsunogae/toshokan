@@ -1,0 +1,3 @@
+2026-05-25 16:26:42.663550+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "BOOK" not found (this database is empty); SQL statement:
+SELECT * FROM BOOK WHERE TITLE = ? [42104-240]
