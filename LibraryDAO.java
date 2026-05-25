@@ -1,170 +1,135 @@
-
 import java.sql.*;
 import java.util.*;
 
 public class LibraryDAO {
 
-    private static final String URL
-            = "jdbc:h2:file:./library";
+  private static final String URL = "jdbc:h2:file:./library";
 
-    private static final String USER = "sa";
+  private static final String USER = "sa";
 
-    private static final String PASSWORD = "";
+  private static final String PASSWORD = "";
 
-    public LibraryDAO() {
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+  public LibraryDAO() {
+    try {
+      Class.forName("org.h2.Driver");
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
+
+  // getState(検索するID)
+  public Integer getState(int id) {
+
+    Connection conn = null;
+
+    try {
+      conn = DriverManager.getConnection(URL, USER, PASSWORD);
+
+      String sql = "SELECT STATUS FROM BOOK WHERE ID = ?";
+
+      PreparedStatement pStmt = conn.prepareStatement(sql);
+
+      pStmt.setInt(1, id);
+
+      ResultSet rs = pStmt.executeQuery();
+
+      if (rs.next()) {
+
+        int status = rs.getInt("STATUS");
+
+        if (status == 0) {
+          return 0;
+        } else {
+          return 1;
         }
+      }
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (conn != null) {
+          conn.close();
+        }
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
     }
 
-    //getState(検索するID)
-    public Integer getState(int id) {
+    return null;
+  }
 
-        Connection conn = null;
+  // setState(セットするID、状態)
+  public boolean setState(int id, int state) {
 
-        try {
-            conn = DriverManager.getConnection(
-                    URL,
-                    USER,
-                    PASSWORD
-            );
+    Connection conn = null;
 
-            String sql
-                    = "SELECT STATUS FROM BOOK WHERE ID = ?";
+    try {
+      conn = DriverManager.getConnection(URL, USER, PASSWORD);
 
-            PreparedStatement pStmt
-                    = conn.prepareStatement(sql);
+      String sql = "UPDATE BOOK " + "SET STATUS = ? " + "WHERE ID = ?";
 
-            pStmt.setInt(1, id);
+      PreparedStatement pStmt = conn.prepareStatement(sql);
 
-            ResultSet rs = pStmt.executeQuery();
+      pStmt.setInt(1, state);
+      pStmt.setInt(2, id);
 
-            if (rs.next()) {
+      int result = pStmt.executeUpdate();
 
-                int status
-                        = rs.getInt("STATUS");
+      if (result > 0) {
+        return true;
+      }
 
-                if (status == 0) {
-                    return 0;
-                } else {
-                    return 1;
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (conn != null) {
+          conn.close();
         }
-
-        return null;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
     }
 
-    //setState(セットするID、状態)
-    public boolean setState(
-            int id,
-            int state
-    ) {
+    return false;
+  }
 
-        Connection conn = null;
+  // searchBook('name') -> return List(id, 'name', 'author', status)
+  public List<Object> searchBook(String title) {
+    Connection conn = null;
 
-        try {
-            conn = DriverManager.getConnection(
-                    URL,
-                    USER,
-                    PASSWORD
-            );
+    try {
+      conn = DriverManager.getConnection(URL, USER, PASSWORD);
 
-            String sql
-                    = "UPDATE BOOK "
-                    + "SET STATUS = ? "
-                    + "WHERE ID = ?";
+      String sql = "SELECT * FROM BOOK WHERE TITLE LIKE ? OR AUTHOR LIKE ?";
 
-            PreparedStatement pStmt
-                    = conn.prepareStatement(sql);
+      PreparedStatement pStmt = conn.prepareStatement(sql);
+      pStmt.setString(1, "%" + title + "%");
+      pStmt.setString(2, "%" + title + "%");
 
-            pStmt.setInt(1, state);
-            pStmt.setInt(2, id);
+      ResultSet rs = pStmt.executeQuery();
 
-            int result
-                    = pStmt.executeUpdate();
+      if (rs.next()) {
+        List<Object> bookData = new ArrayList<Object>();
+        bookData.add(rs.getInt("ID"));
+        bookData.add(rs.getString("TITLE"));
+        bookData.add(rs.getString("AUTHOR"));
+        bookData.add(rs.getInt("STATUS"));
 
-            if (result > 0) {
-                return true;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        return bookData;
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (conn != null) {
+          conn.close();
         }
-
-        return false;
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
     }
-
-    //searchBook('name') -> return List(id, 'name', 'author', status)
-    public List<Object> searchBook(String title) {
-        Connection conn = null;
-
-        try {
-            conn = DriverManager.getConnection(
-                    URL,
-                    USER,
-                    PASSWORD
-            );
-
-            String sql
-                    = "SELECT * FROM BOOK WHERE TITLE = ?";
-
-            PreparedStatement pStmt
-                    = conn.prepareStatement(sql);
-            pStmt.setString(1, title);
-
-            ResultSet rs = pStmt.executeQuery();
-
-            if (rs.next()) {
-                List<Object> bookData
-                        = new ArrayList<Object>();
-                bookData.add(
-                        rs.getInt("ID")
-                );
-                bookData.add(
-                        rs.getString("TITLE")
-                );
-                bookData.add(
-                        rs.getString("AUTHOR")
-                );
-                bookData.add(
-                        rs.getInt("STATUS")
-                );
-
-                return bookData;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 }
