@@ -1,60 +1,96 @@
-\documentclass[a4j,11pt]{jarticle}
-\usepackage{fancyheadings}
-%\usepackage{here}
-\usepackage[dvipdfmx]{graphicx}
+\documentclass[a4paper,11pt]{ltjsarticle}
+\usepackage{luatexja-fontspec}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{url}
+
+% コードのハイライト設定
 \lstset{
-  language=C,
-  basicstyle=\ttfamily\small,
-  numbers=left,
-  numberstyle=\tiny,
-  stepnumber=1,
-  frame=single,
-  breaklines=true,
-  tabsize=2,
-  commentstyle=\color{green!50!black},
-  keywordstyle=\color{blue},
-  stringstyle=\color{red}
+    language=Java,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{green!50!black},
+    frame=single,
+    breaklines=true,
+    showstringspaces=false,
+    captionpos=b
 }
 
-\renewcommand{\thepage}{\small -- \arabic{page} --}
-%\headrulewidth=0pt
-\rhead{}
-\lhead{}
-\textheight 234mm
-%
-\usepackage{float}
-\usepackage{amsmath}	% required for `\cases' (yatex added)
-\usepackage{bm}
-\usepackage{ascmac}	% required for `\screen' (yatex added)
-\usepackage{color}
-
 \title{プログラミング応用課題レポート}
-\date{2026/5/19}
-
 \author{36714087 角替勝信\\
 34714148 Lee Chanhee\\
 36719030 林遥都}
-%
-%
+\date{2026年5月25日}
+
 \begin{document}
+
 \maketitle
-\clearpage
 
-\section{プログラム}
-\begin{lstlisting}
+\section{はじめに}
+本レポートでは、Java 17およびH2データベースを用いた「図書管理システム」の実装について報告する。本システムは、本の貸出・返却・検索といった基本的な管理機能を備え、オブジェクト指向設計および最新のJava言語仕様を活用して開発した。
 
+\section{システム構成と要件への対応}
+本プログラムは課題の要件に基づき、以下の技術要素を含んでいる。
+\begin{itemize}
+    \item \textbf{データベース}: H2データベースを用い、JDBC経由で本の情報を永続化している。
+    \item \textbf{テストコード}: JUnit 4を用いて、各状態の遷移ロジックを検証している。
+    \item \textbf{デザインパターン}: GoFのデザインパターンから「Stateパターン」を採用した。
+    \item \textbf{Java 17の新機能}: 「Sealed Interface（封印されたインターフェース）」を採用した。
+    \item \textbf{対象外項目}: 銀行アカウント管理以外のテーマとして、図書管理を選択した。
+\end{itemize}
+
+\section{デザインパターン：Stateパターン}
+本の状態（貸出可能、貸出中）に応じた振る舞いの変化を管理するため、Stateパターンを適用した。
+
+\subsection{クラス構成}
+\begin{itemize}
+    \item \texttt{BookState}：状態を表すインターフェース。
+    \item \texttt{AvailableState}：「貸出可能」状態を表す具象クラス。
+    \item \texttt{LoanedState}：「貸出中」状態を表す具象クラス。
+    \item \texttt{Book}：現在の状態を保持し、操作を委譲するコンテキストクラス。
+\end{itemize}
+
+\subsection{利点}
+if文やswitch文による複雑な分岐を排除し、各状態のロジックを独立したクラスにカプセル化することで、状態の追加や変更が容易な構造とした。
+
+\section{Java 17の新機能：Sealed Interface}
+本システムでは、\texttt{BookState} の実装クラスを意図した2つのみに制限するため、Java 17の \textbf{Sealed Interface} を使用した。
+
+\begin{lstlisting}[caption=Sealed Interfaceの実装例]
+public sealed interface BookState permits AvailableState, LoanedState {
+    BookState borrowBook() throws Exception;
+    BookState returnBook() throws Exception;
+    int getStatusNum();
+}
 \end{lstlisting}
 
-\section{貸出状況の管理}
-本の貸出状況を管理するために、BoFのデザインパターンのStateパターンを用いている。
-BookStateインターフェースを作成し、AvailableState, LoanedStateクラスで継承している。
-この時、Java 17の新機能であるSealed Classesを使用し、他のクラスから継承できないように工夫をしている。
+\texttt{permits} 句により、許可されたクラス以外がこのインターフェースを実装することを防いでいる。これにより、プログラム上で「貸出可能」と「貸出中」以外の不正な状態が作られることをコンパイルレベルで防止でき、安全性が向上している。
 
-このBookStateをBookクラスから管理している。
-Bookクラスでは、現在の状況に応じて自動的に貸し借り、また現在の状態を得れるようにしている。
+\section{データベース設計}
+データベースにはH2データベースを使用し、以下のテーブル構造で本の情報を管理している。
 
-さらに、LibraryServiceクラスでは、引数で指定されたidの本の状態をLibraryDAOクラスから取得し、その情報を用いてBookクラスに貸し借りが可能か確認し、貸し借りが可能であれば変更後の状態をデータベースに書き込むようにしている。
+\begin{lstlisting}[caption=テーブル作成SQL (schema.sql), language=SQL]
+CREATE TABLE BOOK (
+    ID INT PRIMARY KEY,
+    TITLE VARCHAR(255) NOT NULL,
+    AUTHOR VARCHAR(255) NOT NULL,
+    STATUS INT NOT NULL -- 1: 貸出可能, 0: 貸出中
+);
+\end{lstlisting}
+
+また、\texttt{LibraryDAO} クラスでは \texttt{LIKE} 演算子を用いた「あいまい検索」を実装し、タイトルまたは著者の部分一致による検索を可能とした。
+
+\section{テスト結果}
+JUnitを用いて、以下のシナリオをテストした。
+\begin{itemize}
+    \item 貸出可能状態での「貸出」操作 $\rightarrow$ 成功（貸出中へ遷移）
+    \item 貸出可能状態での「返却」操作 $\rightarrow$ 例外発生（不整合の防止）
+    \item 貸出中状態での「返却」操作 $\rightarrow$ 成功（貸出可能へ遷移）
+\end{itemize}
+テストの結果、すべての項目で期待通りの動作を確認した。
+
+\section{おわりに}
+本課題を通じて、デザインパターンによる設計の柔軟性と、Java 17の新しい型システムによる安全性の向上を学ぶことができた。今後も適切な設計パターンの適用を意識した開発を行いたい。
 
 \end{document}
