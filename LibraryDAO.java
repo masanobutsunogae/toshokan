@@ -1,10 +1,11 @@
+
 import java.sql.*;
 import java.util.*;
 
 public class LibraryDAO {
 
-    private static final String URL =
-        "jdbc:h2:file:./library";
+    private static final String URL
+            = "jdbc:h2:file:./library";
 
     private static final String USER = "sa";
 
@@ -13,11 +14,11 @@ public class LibraryDAO {
     public LibraryDAO() {
         try {
             Class.forName("org.h2.Driver");
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
+
     //getState(検索するID)
     public Integer getState(int id) {
 
@@ -25,16 +26,16 @@ public class LibraryDAO {
 
         try {
             conn = DriverManager.getConnection(
-                URL,
-                USER,
-                PASSWORD
+                    URL,
+                    USER,
+                    PASSWORD
             );
 
-            String sql =
-                "SELECT STATUS FROM BOOK WHERE ID = ?";
+            String sql
+                    = "SELECT STATUS FROM BOOK WHERE ID = ?";
 
-            PreparedStatement pStmt =
-                conn.prepareStatement(sql);
+            PreparedStatement pStmt
+                    = conn.prepareStatement(sql);
 
             pStmt.setInt(1, id);
 
@@ -42,28 +43,24 @@ public class LibraryDAO {
 
             if (rs.next()) {
 
-                int status =
-                    rs.getInt("STATUS");
+                int status
+                        = rs.getInt("STATUS");
 
                 if (status == 0) {
                     return 0;
-                }
-                else {
+                } else {
                     return 1;
                 }
             }
 
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
@@ -73,48 +70,45 @@ public class LibraryDAO {
 
     //setState(セットするID、状態)
     public boolean setState(
-        int id,
-        int state
+            int id,
+            int state
     ) {
 
         Connection conn = null;
 
         try {
             conn = DriverManager.getConnection(
-                URL,
-                USER,
-                PASSWORD
+                    URL,
+                    USER,
+                    PASSWORD
             );
 
-            String sql =
-                "UPDATE BOOK " +
-                "SET STATUS = ? " +
-                "WHERE ID = ?";
+            String sql
+                    = "UPDATE BOOK "
+                    + "SET STATUS = ? "
+                    + "WHERE ID = ?";
 
-            PreparedStatement pStmt =
-                conn.prepareStatement(sql);
+            PreparedStatement pStmt
+                    = conn.prepareStatement(sql);
 
             pStmt.setInt(1, state);
             pStmt.setInt(2, id);
 
-            int result =
-                pStmt.executeUpdate();
+            int result
+                    = pStmt.executeUpdate();
 
             if (result > 0) {
                 return true;
             }
 
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             try {
                 if (conn != null) {
                     conn.close();
                 }
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
@@ -123,52 +117,51 @@ public class LibraryDAO {
     }
 
     //searchBook('name') -> return List(id, 'name', 'author', status)
-    public List<Object> searchBook(String title){
+    public static List<Object> searchBook(String title) {
         Connection conn = null;
 
-        try{
+        try {
             conn = DriverManager.getConnection(
-                URL,
-                USER,
-                PASSWORD
+                    URL,
+                    USER,
+                    PASSWORD
             );
 
-            String sql = 
-                "SELECT * FROM BOOK WHERE TITLE = ?";
-            
-            PreparedStatement pStmt = 
-                conn.prepareStatement(sql);
+            String sql
+                    = "SELECT * FROM BOOK WHERE TITLE = ?";
+
+            PreparedStatement pStmt
+                    = conn.prepareStatement(sql);
             pStmt.setString(1, title);
 
             ResultSet rs = pStmt.executeQuery();
 
-            if(rs.next()){
-                List<Object> bookData = 
-                    new ArrayList<Object>();
+            if (rs.next()) {
+                List<Object> bookData
+                        = new ArrayList<Object>();
                 bookData.add(
-                    rs.getInt("ID")
+                        rs.getInt("ID")
                 );
                 bookData.add(
-                    rs.getString("TITLE")
+                        rs.getString("TITLE")
                 );
                 bookData.add(
-                    rs.getString("AUTHOR")
+                        rs.getString("AUTHOR")
                 );
                 bookData.add(
-                    rs.getInt("STATUS")
+                        rs.getInt("STATUS")
                 );
 
                 return bookData;
             }
-        } catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
-        }
-        finally{
-            try{
-                if(conn != null){
+        } finally {
+            try {
+                if (conn != null) {
                     conn.close();
                 }
-            } catch(SQLException e){
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }

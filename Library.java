@@ -37,6 +37,11 @@ public class Library {
                     System.out.println("検索する本のタイトルまたは著者名を入力してください。");
                     String name = scanner.next();
                     //検索関数
+                    try {
+                        LibraryDAO.searchBook(name);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case 2:
                     System.out.println("貸出する本のidを入力してください。");
